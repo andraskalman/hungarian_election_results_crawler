@@ -1,4 +1,4 @@
-name: hungarian_election_results_2018_crawler
+name: hungarian_election_results_crawler
 channels:
 - defaults
 dependencies:

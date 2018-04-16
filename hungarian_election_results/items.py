@@ -16,9 +16,9 @@ class CandidateResult(scrapy.Item):
     rate_of_valid_votes = scrapy.Field()
 
 
-class VotingDistrictResult(scrapy.Item):
+class WardResult(scrapy.Item):
     # id = scrapy.Field() # {oevk}-{num}
-    oevk = scrapy.Field()
+    district = scrapy.Field()
     num = scrapy.Field()
 
     location = scrapy.Field()
@@ -40,14 +40,15 @@ class ElectionReport(scrapy.Item):
     participant_stats = scrapy.Field()  # ParticipantStats
     result_stats = scrapy.Field()  # ResultStats
 
-class OEVKResult(ElectionReport):
+
+class DistrictResult(ElectionReport):
     county = scrapy.Field()
-    oevk_num = scrapy.Field()
-    oevk_url = scrapy.Field()
-    oevk_id = scrapy.Field()  # {county}-{oevk}
+    num = scrapy.Field()
+    url = scrapy.Field()
+    id = scrapy.Field()  # {county}-{oevk}
     location = scrapy.Field()
-    voted_candidate = scrapy.Field()
-    voted_candidate_party = scrapy.Field()
+    elected_candidate = scrapy.Field()
+    elected_candidate_party = scrapy.Field()
     progress_of_processing = scrapy.Field()
     page_generated_at = scrapy.Field()
 

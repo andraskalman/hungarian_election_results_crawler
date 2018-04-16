@@ -1,7 +1,7 @@
-Hungarian election 2018 results crawler
+Hungarian election results crawler
 =======================================
 
-Scrapy crawler for the 2018 Hungarian election results from valasztas.hu
+Scrapy crawler for Hungarian election results from valasztas.hu
 
 
 Running the application
@@ -15,7 +15,7 @@ Running the application
 
     Activate the environment
 
-        source activate hungarian_election_results_2018_crawler
+        source activate hungarian_election_results_crawler
 
     1.2. With pip (and virtualenv)
 
@@ -23,27 +23,31 @@ Running the application
         source env/bin/activate
         pip install -r requirements.txt
 
+2. The project contains several spiders:
+   - 2018 electoral districts: `districts_2018`
+   - 2018 electoral wards: `wards_2018`
+
 2. Running the crawlers
 
-   - Crawling OEVK results
+   - Crawling district results (OEVK)
 
-         scrapy crawl oevk
+         scrapy crawl districts_2018
 
-     crawing can be restricted only to one OEVK
+     crawing can be restricted only to one district (district id in paramterer is concatenated from location and number of the district)
 
-         scrapy crawl oevk -a oevk_id=BARANYA-01
+         scrapy crawl districts_2018 -a district_id=BARANYA-01
 
-   - voting district results:
+   - ward results:
 
-         scrapy crawl voting_district
+         scrapy crawl wards_2018
 
     crawing can be restricted only to one location:
 
-         scrapy crawl voting_district -a location=Oroszlány
+         scrapy crawl wards_2018 -a location=Oroszlány
 
-    or only one district:
+    or only one ward:
 
-         scrapy crawl voting_district -a location=Oroszlány -a dictrict_id=004
+         scrapy crawl wards_2018 -a location=Oroszlány -a ward=004
 
 
   The results will be exported to json files named by the crawler and crawling timestamp.

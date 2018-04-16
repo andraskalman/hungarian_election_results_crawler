@@ -9,32 +9,32 @@ import copy
 from . import get_and_norm
 
 
-class VotingDistrictSpider(scrapy.Spider):
-    name = 'voting_district'
+class WardSpider(scrapy.Spider):
+    name = 'wards_2018'
     allowed_domains = ['valasztas.hu']
 
     start_url_pattern = "http://valasztas.hu/dyn/pv18/szavossz/hu/TK/szkkivtk%s.html"
 
-    def __init__(self, location=None, district_id=None, *args, **kwargs):
-        super(VotingDistrictSpider, self).__init__(*args, **kwargs)
+    def __init__(self, location=None, ward=None, *args, **kwargs):
+        super(WardSpider, self).__init__(*args, **kwargs)
         self.location = location
         if location is not None:
             self.start_urls = [self.start_url_pattern % unidecode.unidecode(location[0]).lower()]
         else:
             self.start_urls = [self.start_url_pattern % x for x in ascii_lowercase]
-        self.district_id = district_id
+        self.ward = ward
 
     def parse(self, response):
         links = response.xpath('body/div/center/table[2]//a')
         for link in links:
-            vdr = VotingDistrictResult(
+            wr = WardResult(
                 location=link.xpath('text()').extract_first().strip(),
             )
-            if self.location is None or self.location.lower() == vdr['location'].lower():
+            if self.location is None or self.location.lower() == wr['location'].lower():
                 request = scrapy.Request(urljoin(response.url,
                                  unicodedata.normalize('NFKD', link.xpath('@href').extract_first())),
                                  callback=self.parse_location_page)
-                request.meta['voting_district_result'] = vdr
+                request.meta['ward_result'] = wr
                 yield request
             else:
                 continue
@@ -47,30 +47,30 @@ class VotingDistrictSpider(scrapy.Spider):
 
             # first row has only headers
             if index > 0:
-                vdr = copy.deepcopy(response.meta['voting_district_result'])
-                vdr['num'] = row.xpath('td[1]/a/text()').extract_first().strip()
-                vdr['url'] = urljoin(response.url,
+                wr = copy.deepcopy(response.meta['ward_result'])
+                wr['num'] = row.xpath('td[1]/a/text()').extract_first().strip()
+                wr['url'] = urljoin(response.url,
                                     unicodedata.normalize('NFKD', row.xpath('td[1]/a/@href').extract_first()))
-                vdr['address'] = row.xpath('td[2]/text()').extract_first().strip()
-                vdr['non_local_votes'] = len(row.xpath('td[3]/img')) > 0
-                vdr['counting_cross_registered_and_consulate_votes'] = len(row.xpath('td[4]/img')) > 0
+                wr['address'] = row.xpath('td[2]/text()').extract_first().strip()
+                wr['non_local_votes'] = len(row.xpath('td[3]/img')) > 0
+                wr['counting_cross_registered_and_consulate_votes'] = len(row.xpath('td[4]/img')) > 0
 
-                if self.district_id is None or self.district_id == vdr['num']:
-                    request = scrapy.Request(vdr['url'], callback=self.parse_voting_district_page)
-                    request.meta['voting_district_result'] = vdr
+                if self.ward is None or self.ward == wr['num']:
+                    request = scrapy.Request(wr['url'], callback=self.parse_voting_district_page)
+                    request.meta['ward_result'] = wr
                     yield request
                 else:
                     continue
 
     def parse_voting_district_page(self, response):
-        self.logger.debug("processing voting district page: %s" % response.url)
+        self.logger.debug("processing ward result page: %s" % response.url)
 
-        vdr = response.meta['voting_district_result']
+        wr = response.meta['ward_result']
 
         t1_row = response.xpath('body/div/center/table[1]/tr[1]')
-        vdr['page_generated_at'] = t1_row.xpath('td[1]/text()').extract_first().strip()
+        wr['page_generated_at'] = t1_row.xpath('td[1]/text()').extract_first().strip()
 
-        vdr['oevk'] = response.xpath('body/div/center/h2[2]/text()').extract_first().strip()
+        wr['district'] = response.xpath('body/div/center/h2[2]/text()').extract_first().strip()
 
         ir = IndividualResult(
             scanned_report_url=urljoin(response.url,
@@ -90,7 +90,7 @@ class VotingDistrictSpider(scrapy.Spider):
         summary_row = response.xpath('body/div/center/table[3]/tr[3]')
         ir['register_stats']['local_voters'] = get_and_norm(summary_row.xpath('td[1]/text()'))  # AE
 
-        if vdr['counting_cross_registered_and_consulate_votes']:
+        if wr['counting_cross_registered_and_consulate_votes']:
             ir['register_stats']['cross_registered_voters'] = get_and_norm(summary_row.xpath('td[2]/text()'))  # BE
             ir['register_stats']['consulate_voters'] = get_and_norm(summary_row.xpath('td[3]/text()'))  # C
             ir['register_stats']['total'] = get_and_norm(summary_row.xpath('td[4]/text()'))  # EE
@@ -98,14 +98,14 @@ class VotingDistrictSpider(scrapy.Spider):
             ir['participant_stats']['locals'] = get_and_norm(summary_row.xpath('td[2]/br/preceding-sibling::text()'))  # FE
             ir['participant_stats']['locals_vote_rate'] = summary_row.xpath('td[2]/br/following-sibling::text()').extract_first().strip()  # FE
 
-        if vdr['non_local_votes']:
+        if wr['non_local_votes']:
             offset = 1
             t4_row = response.xpath('body/div/center/table[4]/tr[3]')
             ir['register_stats']['non_local_voters'] = get_and_norm(t4_row.xpath('td[1]/text()'))  # BOE
             ir['participant_stats']['non_locals'] = get_and_norm(t4_row.xpath('td[2]/br/preceding-sibling::text()'))  # GE
             ir['participant_stats']['non_locals_vote_rate'] = t4_row.xpath('td[2]/br/following-sibling::text()').extract_first().strip()  # GE
 
-        if vdr['counting_cross_registered_and_consulate_votes']:
+        if wr['counting_cross_registered_and_consulate_votes']:
             offset = 1
             t4_row = response.xpath('body/div/center/table[4]/tr[3]')
             ir['participant_stats']['locals'] = get_and_norm(t4_row.xpath('td[1]/text()'))  # FE
@@ -115,7 +115,7 @@ class VotingDistrictSpider(scrapy.Spider):
 
         stat_table_row = response.xpath("body/div/center/table[%s]/tr[3]" % str(4 + offset))
         col_offset = 0
-        if vdr['non_local_votes']:
+        if wr['non_local_votes']:
             col_offset = 1
             ir['result_stats']['non_local_envelopes_in_urn'] = get_and_norm(stat_table_row.xpath("td[1]/text()"))  # IE
         ir['result_stats']['unstamped_pages_in_urn'] = get_and_norm(stat_table_row.xpath("td[%s]/text()" % str(1 + col_offset)))  # OE
@@ -140,7 +140,7 @@ class VotingDistrictSpider(scrapy.Spider):
                     )
                 )
 
-        vdr['individual_results'] = ir
+        wr['individual_results'] = ir
 
         gr = GeneralListResult(
             scanned_report_url=urljoin(response.url,
@@ -148,7 +148,7 @@ class VotingDistrictSpider(scrapy.Spider):
                                            "body/div/center/table[%s]/tr[1]/td[3]/a/@href" % str(6 + offset)).extract_first()))
         )
 
-        if vdr['counting_cross_registered_and_consulate_votes']:
+        if wr['counting_cross_registered_and_consulate_votes']:
             gr['register_stats'] = RegisterStats()
             gr['participant_stats'] = ParticipantStats()
 
@@ -230,7 +230,7 @@ class VotingDistrictSpider(scrapy.Spider):
                     valid_pages=get_and_norm(general_list_table.xpath('tr[4]/td[8]/text()'))
                 )
 
-        if vdr['non_local_votes']:
+        if wr['non_local_votes']:
             gr['register_stats'] = RegisterStats()
             gr['participant_stats'] = ParticipantStats()
             general_list_table_non_local = response.xpath("body/div/center/table[%s]" % str(8 + offset))
@@ -255,14 +255,14 @@ class VotingDistrictSpider(scrapy.Spider):
                         num_of_votes=get_and_norm(row.xpath('td[3]/text()')),
                     )
                 )
-        vdr['general_list_results'] = gr
+        wr['general_list_results'] = gr
 
         if has_minority_results:
             gr['minority_results'] = {}
             minority_list_rows = response.xpath("body/div/center/table[%s]/tr" % str(9 + offset))
             for index, row in enumerate(minority_list_rows):
                 if index > 0:
-                    if vdr['counting_cross_registered_and_consulate_votes']:
+                    if wr['counting_cross_registered_and_consulate_votes']:
                         gr['minority_results'][row.xpath('td[1]/text()').extract_first().strip()] = ListResultStats(
                             total_registered=get_and_norm(row.xpath('td[2]/text()')),
                             unstamped_pages_in_urn=get_and_norm(row.xpath('td[3]/text()')),
@@ -282,4 +282,4 @@ class VotingDistrictSpider(scrapy.Spider):
                             valid_pages=get_and_norm(row.xpath('td[8]/text()'))
                         )
 
-        yield vdr
+        yield wr

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Scrapy settings for hungarian_election_results_2018 project
+# Scrapy settings for hungarian_election_results project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -9,14 +9,14 @@
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'hungarian_election_results_2018'
+BOT_NAME = 'hungarian_election_results'
 
-SPIDER_MODULES = ['hungarian_election_results_2018.spiders']
-NEWSPIDER_MODULE = 'hungarian_election_results_2018.spiders'
+SPIDER_MODULES = ['hungarian_election_results.spiders']
+NEWSPIDER_MODULE = 'hungarian_election_results.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'hungarian_election_results_2018 (+http://www.yourdomain.com)'
+#USER_AGENT = 'hungarian_election_results (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
@@ -47,13 +47,13 @@ ROBOTSTXT_OBEY = True
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    'hungarian_election_results_2018.middlewares.HungarianElectionResults2018SpiderMiddleware': 543,
+#    'hungarian_election_results.middlewares.HungarianElectionResultsSpiderMiddleware': 543,
 #}
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    'hungarian_election_results_2018.middlewares.HungarianElectionResults2018DownloaderMiddleware': 543,
+#    'hungarian_election_results.middlewares.HungarianElectionResultsDownloaderMiddleware': 543,
 #}
 
 # Enable or disable extensions
@@ -65,7 +65,7 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'hungarian_election_results_2018.pipelines.HungarianElectionResults2018Pipeline': 300,
+    'hungarian_election_results.pipelines.HungarianElectionResultsPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
