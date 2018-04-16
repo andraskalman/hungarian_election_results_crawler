@@ -52,21 +52,22 @@ class CandidateResult(scrapy.Item):
 
 class VotingDistrictResult(scrapy.Item):
 
-    id = scrapy.Field() # {oevk}-{num}
+    #id = scrapy.Field() # {oevk}-{num}
     oevk = scrapy.Field()
     num = scrapy.Field()
 
     location = scrapy.Field()
     address = scrapy.Field()
 
-    non_locals_allowed = scrapy.Field()
+    non_local_votes = scrapy.Field()
+    non_local_and_consulate_votes = scrapy.Field()
 
     url = scrapy.Field()
 
     page_generated_at = scrapy.Field()
 
-    individual_results = scrapy.Field()
-    general_list_results = scrapy.Field()
+    individual_results = scrapy.Field()         # IndividualResult
+    general_list_results = scrapy.Field()       # GeneralListResult
 
 
 class ElectionReport(scrapy.Item):
@@ -74,9 +75,17 @@ class ElectionReport(scrapy.Item):
     locals_voted = scrapy.Field()               # FE
     locals_vote_rate = scrapy.Field()           # FE
 
-    non_locals_registered = scrapy.Field()      # BOE / BOL
+    registered = scrapy.Field()                 # AL
+
+    non_locals_registered = scrapy.Field()      # BE / BOE / BOL
     non_locals_voted = scrapy.Field()           # GE / GL
     non_locals_vote_rate = scrapy.Field()       # GE_rate
+
+    registered_at_consulates = scrapy.Field()  # CE
+    total_num_of_registered = scrapy.Field()   # EE
+    non_local_and_consulate_envelope_votes = scrapy.Field()            # IE
+    total_num_of_voters = scrapy.Field()            # JE
+    total_vote_rate = scrapy.Field()                # JE
 
     non_local_envelopes_in_urn = scrapy.Field() # IE
     unstamped_pages_in_urn = scrapy.Field()     # OE
@@ -93,7 +102,7 @@ class IndividualResult(ElectionReport):
     candidate_results = scrapy.Field()      # list of CandidateResult
 
 
-class GeneralListResult(scrapy.Item):
+class GeneralListResult(ElectionReport):
     scanned_report_url = scrapy.Field()
 
     total_summary = scrapy.Field()          # election report
