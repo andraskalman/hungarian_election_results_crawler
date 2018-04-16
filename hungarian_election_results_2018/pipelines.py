@@ -13,4 +13,5 @@ class HungarianElectionResults2018Pipeline(object):
         # Normalize page generated text
         if item['page_generated_at']:
             item['page_generated_at'] = item['page_generated_at'].replace('Frissitve:', '').replace(u'\xa0', u' ').strip()
+            item['oevk'] = item['oevk'].replace('.számú egyéni választókerületi szavazás', '').replace(u'\xa0',u' ').strip()
         return item

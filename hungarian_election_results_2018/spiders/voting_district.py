@@ -68,6 +68,9 @@ class VotingDistrictSpider(scrapy.Spider):
 
         t1_row = response.xpath('body/div/center/table[1]/tr[1]')
         vdr['page_generated_at'] = t1_row.xpath('td[1]/text()').extract_first().strip();
+        vdr['page_generated_at'] = t1_row.xpath('td[1]/text()').extract_first().strip()
+
+        vdr['oevk'] = response.xpath('body/div/center/h2[2]/text()').extract_first().strip()
 
         ir = IndividualResult(
             scanned_report_url = urljoin(response.url,
