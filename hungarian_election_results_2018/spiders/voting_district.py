@@ -151,7 +151,8 @@ class VotingDistrictSpider(scrapy.Spider):
             valid_pages=general_list_table.xpath('tr[3]/td[8]/text()').extract_first().strip().replace(u'\xa0', u'')
         )
 
-        if general_list_table.xpath('tr[4]') is not None:
+        has_minority_results = len(general_list_table.xpath('tr')) > 3
+        if has_minority_results:
             gr['minority_list_summary'] = ElectionReport(
                 locals_registered=general_list_table.xpath('tr[4]/td[2]/text()').extract_first().strip().replace(u'\xa0', u''),
                 locals_voted=general_list_table.xpath('tr[4]/td[3]/text()').extract_first().strip().replace(u'\xa0', u''),
@@ -188,7 +189,7 @@ class VotingDistrictSpider(scrapy.Spider):
                 )
         vdr['general_list_results'] = gr
 
-        if gr['minority_list_summary'] is not None:
+        if has_minority_results:
             gr['minority_results'] = {}
             minority_list_rows = response.xpath("body/div/center/table[%s]/tr" % str(9 + offset))
             for index, row in enumerate(minority_list_rows):
