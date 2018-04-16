@@ -9,9 +9,11 @@
 class HungarianElectionResults2018Pipeline(object):
 
     def process_item(self, item, spider):
-
         # Normalize page generated text
-        if item['page_generated_at']:
+        if 'page_generated_at' in item:
             item['page_generated_at'] = item['page_generated_at'].replace('Frissitve:', '').replace(u'\xa0', u' ').strip()
-            item['oevk'] = item['oevk'].replace('.számú egyéni választókerületi szavazás', '').replace(u'\xa0',u' ').strip()
+
+        if 'oevk' in item:
+            item['oevk'] = item['oevk'].replace('.számú egyéni választókerületi szavazás', '').replace(u'\xa0', u' ').strip()
+
         return item
