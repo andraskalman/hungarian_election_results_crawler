@@ -39,17 +39,21 @@ Running the application
 
          scrapy crawl districts_2018 -a district_id=BARANYA-01
 
+     or at 2014 district crawler
+
+         scrapy crawl districts_2014 -a county_filter=somogy -a district_num_filter=03
+
    - ward results:
 
          scrapy crawl wards_2018
 
     crawing can be restricted only to one location:
 
-         scrapy crawl wards_2018 -a location=Oroszlány
+         scrapy crawl wards_2018 -a location_filter=Oroszlány
 
     or only one ward:
 
-         scrapy crawl wards_2018 -a location=Oroszlány -a ward=004
+         scrapy crawl wards_2018 -a location_filter=Oroszlány -a ward_filter=004
 
 
   The results will be exported to json files named by the crawler and crawling timestamp.

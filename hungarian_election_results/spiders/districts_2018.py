@@ -6,14 +6,14 @@ from ..items import *
 from . import get_and_norm
 
 
-class DistrictSpider(scrapy.Spider):
+class District2018Spider(scrapy.Spider):
     name = 'districts_2018'
     allowed_domains = ['valasztas.hu']
     start_urls = ['http://valasztas.hu/dyn/pv18/szavossz/hu/oevker.html']
 
-    def __init__(self, district_id=None, *args, **kwargs):
-        super(DistrictSpider, self).__init__(*args, **kwargs)
-        self.district_id = district_id
+    def __init__(self, district_id_filter=None, *args, **kwargs):
+        super(District2018Spider, self).__init__(*args, **kwargs)
+        self.district_id_filter = district_id_filter
 
     def parse(self, response):
         rows = response.xpath('body/div/center/table[2]/tr')
@@ -33,7 +33,7 @@ class DistrictSpider(scrapy.Spider):
                 )
 
                 oevk_result['id'] = "%s-%s" % (oevk_result['county'], oevk_result['num'])
-                if self.district_id is None or self.district_id == oevk_result['id']:
+                if self.district_id_filter is None or self.district_id_filter == oevk_result['id']:
                     request = scrapy.Request(oevk_result['url'], callback=self.parse_oevk_result_page)
                     request.meta['oevk_result'] = oevk_result
                     yield request

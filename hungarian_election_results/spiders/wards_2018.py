@@ -9,20 +9,20 @@ import copy
 from . import get_and_norm
 
 
-class WardSpider(scrapy.Spider):
+class Ward2018Spider(scrapy.Spider):
     name = 'wards_2018'
     allowed_domains = ['valasztas.hu']
 
     start_url_pattern = "http://valasztas.hu/dyn/pv18/szavossz/hu/TK/szkkivtk%s.html"
 
-    def __init__(self, location=None, ward=None, *args, **kwargs):
-        super(WardSpider, self).__init__(*args, **kwargs)
-        self.location = location
-        if location is not None:
-            self.start_urls = [self.start_url_pattern % unidecode.unidecode(location[0]).lower()]
+    def __init__(self, location_filter=None, ward_filter=None, *args, **kwargs):
+        super(Ward2018Spider, self).__init__(*args, **kwargs)
+        self.location_filter = location_filter
+        if location_filter is not None:
+            self.start_urls = [self.start_url_pattern % unidecode.unidecode(location_filter[0]).lower()]
         else:
             self.start_urls = [self.start_url_pattern % x for x in ascii_lowercase]
-        self.ward = ward
+        self.ward_filter = ward_filter
 
     def parse(self, response):
         links = response.xpath('body/div/center/table[2]//a')
@@ -30,7 +30,7 @@ class WardSpider(scrapy.Spider):
             wr = WardResult(
                 location=link.xpath('text()').extract_first().strip(),
             )
-            if self.location is None or self.location.lower() == wr['location'].lower():
+            if self.location_filter is None or self.location_filter.lower() == wr['location'].lower():
                 request = scrapy.Request(urljoin(response.url,
                                  unicodedata.normalize('NFKD', link.xpath('@href').extract_first())),
                                  callback=self.parse_location_page)
@@ -55,14 +55,14 @@ class WardSpider(scrapy.Spider):
                 wr['non_local_votes'] = len(row.xpath('td[3]/img')) > 0
                 wr['counting_cross_registered_and_consulate_votes'] = len(row.xpath('td[4]/img')) > 0
 
-                if self.ward is None or self.ward == wr['num']:
-                    request = scrapy.Request(wr['url'], callback=self.parse_voting_district_page)
+                if self.ward_filter is None or self.ward_filter == wr['num']:
+                    request = scrapy.Request(wr['url'], callback=self.parse_ward_page)
                     request.meta['ward_result'] = wr
                     yield request
                 else:
                     continue
 
-    def parse_voting_district_page(self, response):
+    def parse_ward_page(self, response):
         self.logger.debug("processing ward result page: %s" % response.url)
 
         wr = response.meta['ward_result']
