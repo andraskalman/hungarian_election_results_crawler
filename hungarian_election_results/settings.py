@@ -19,7 +19,7 @@ NEWSPIDER_MODULE = 'hungarian_election_results.spiders'
 #USER_AGENT = 'hungarian_election_results (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False # http://valtor.valasztas.hu/robots.txt times out and makes crawling impossible
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
