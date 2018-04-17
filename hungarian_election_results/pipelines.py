@@ -14,6 +14,9 @@ class HungarianElectionResultsPipeline(object):
             item['page_generated_at'] = item['page_generated_at'].replace('Frissitve:', '').replace(u'\xa0', u' ').strip()
 
         if 'district' in item:
-            item['district'] = item['district'].replace('.számú egyéni választókerületi szavazás', '').replace(u'\xa0', u' ').strip()
+            item['district'] = item['district'].replace('.számú egyéni választókerületi szavazás', '').replace(u'\xa0', u' ').strip() # 2018
+            item['district'] = item['district']\
+                .replace(' megye', '').replace(' főváros', '') \
+                .replace('. számú egyéni választókerület', '').replace(u'\xa0',u' ').strip() # 2014
 
         return item

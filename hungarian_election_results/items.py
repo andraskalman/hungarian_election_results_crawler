@@ -118,3 +118,7 @@ class ListResultStats(ResultStats):
     locals_registered = scrapy.Field()
     total_registered = scrapy.Field()
     locals_voted = scrapy.Field()
+
+    received_envelopes  = scrapy.Field() # 2014
+    total_voted = scrapy.Field() # 2014
+    stamped_pages_in_urn_and_envelopes = scrapy.Field()  # 2014

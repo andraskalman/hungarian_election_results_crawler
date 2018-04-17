@@ -26,6 +26,8 @@ Running the application
 2. The project contains several spiders:
    - 2018 electoral districts: `districts_2018`
    - 2018 electoral wards: `wards_2018`
+   - 2014 electoral districts: `districts_2014`
+   - 2014 electoral wards: `wards_2014`
 
 2. Running the crawlers
 
